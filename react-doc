@@ -1,0 +1,6 @@
+1). brew install node -> installs node on mac os using brew
+2). node -v -> check the version of node on your machine
+3). npm -v -> check the version of npm on your machine
+4). npm install -g create-react-app -> This package allows you to bootstrap React applications with zero-configuration (-g makes it available globally)
+5). create-react-app --version -> check the version of create-react-app
+6). create-react-app demo-app -> create a demo react app
