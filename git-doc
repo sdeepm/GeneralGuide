@@ -3,7 +3,7 @@ Create a new repository on the command line:
 2).git add README.md
 3).git commit -m "first commit"
 4).git remote add origin https://github.com/rayadams1/GeneralGuide.git
-5).git push -u origin master
+5).git push -u origin master -> "origin" is a shorthand name for the remote repository that a project was originally cloned from.
 
 Push an existing repository from the command line (it has to be a git repo):
 1).git remote add origin https://github.com/rayadams1/GeneralGuide.git
