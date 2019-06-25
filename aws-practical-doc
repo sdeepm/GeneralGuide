@@ -1,0 +1,6 @@
+1). SES -> Create an IAM Role with full SES access.
+           Attach the Role with an instance by going to EC2 management -> Select Instance -> Actions -> Instance Settings ->
+           Attach/Replace IAM Role.
+           Enable your Email Id to send and recieve SMS for SES in a region.
+           Install pip and boto in the instance and send Email from there.
+           
