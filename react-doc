@@ -3,4 +3,50 @@
 3). npm -v -> check the version of npm on your machine
 4). npm install -g create-react-app -> This package allows you to bootstrap React applications with zero-configuration (-g makes it available globally)
 5). create-react-app --version -> check the version of create-react-app
-6). create-react-app demo-app -> create a demo react app
+6). create-react-app demo-app -> This command installs a 
+				 a). react	
+				 b). lightweight development server
+				 c). webpack -> for bundling our files 
+				 d). babel -> modern javascript compiler
+				 e). etc
+7). npm start => Starts the development server
+8). npm run build => Bundles the app into static files for production
+9). npm test => Starts the test runner
+10). npm run eject => Removes the tool and copies build dependencies, configuration files and scripts into the app directory. Once done we cannot go back 
+11). npm start => launches the development server on port 3000 and open up the default browser
+12). <div id="root"></div> in index.html is where the react application will appear.
+13). ECMA Script is the standardized name for JavaScript.
+
+
+React was developed by facebook and is one the most powerful javascript library along with Angular and View
+
+Components:
+1). They are piece of UI -> they should be independent , isolated and reusable
+2). Every react app has atleast 1 component called the root component which contains other child components
+3). Component is implemented as follows :
+	class Tweet {
+		state = {};
+		render () {
+			}
+		    }
+4). State is the data we want to display when the component is rendered
+5). render method describes what the UI should look like
+6). Ouput of render method -> plain JS Object that represents a DOM element in memory
+7). React Element contains virtual DOM , Browser contains real DOM
+8). react reacts to state changes and updates the part of the virtual and real dom that has been changed
+9). React => Library(makes sure the view is in sync with the state & we have the flexibility to choose which external libraries we want to use) & Angular => Framework
+10). Inside the render method is JSX Javascript XML.
+11). index.js is the entry point for react application
+12). registerServiceWorker.js provides assets from a local cache in a production environment
+13). Virtual DOM is a lightweight in memory representation of the UI 
+
+Extensions in Visual Studio Code:
+1). Prettier Code Formatter  
+2). Simple React Snippets
+
+DependencyResolution:
+If any dependency demands installing peer dependencies clone the dependency itself and run 'npm install dependency-name'
+
+Shortcuts:
+Command + D for multi cursor editing on VSCode
+

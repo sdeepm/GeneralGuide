@@ -1,0 +1,113 @@
+Practitioner Tier => Certified Cloud Practitioner 
+	-> Associate Tier => Certified Solutions Architect Associate, Certified Developer Associate, Certified SysOps Administrator Associate
+		-> Professional Tier => Certified Solutions Architect Professional, DevOps Professional
+			-> Speciality Tier => Advanced Networking, Big Data, Security, Machine Learning
+
+Region -> 2 or more Availability Zone
+Availability Zone -> 1 or more discrete Data Centers
+
+Edge Locations are endpoints for AWS which are used for caching content. Typically it consists of CloudFront, Amazon's Content Delivery Network(CDN). 
+There are more edge locations than regions(currently 150)
+
+IAM => Identity Access Management (allows you to manage users and their level of access to the AWS console)
+	-> gives you centralized access to AWS account
+	-> shared access to AWS account
+	-> granular permissions
+	-> identity federation(active directory, facebook, linkedin)
+	-> MFA => multifactor authentication
+	-> provides temporary access to users and devices where necessary
+	-> allows setting up your own password retention policy
+	-> integrates with many different AWS Services
+	-> supports PCI/DSS compliance
+
+  -> Authentication
+	-> Users => end users such as people or organization
+	-> Groups => a collection of users. Each user in the group will inherit the permissions of the group
+	-> Roles => we create roles and assign them to AWS resources (allowing one part of AWS to do something with another part)
+
+  -> Authorization	
+	-> Policies are the permissions => made up of documents called policy documents. They are in JSON format. Give Permissions as to what a User/Group/Role is able to do
+		
+  Every Policy has an effect, action and resource
+
+S3 => Simple Storage Service
+ 	-> secure, durable and highly scalable object storage(flat files-> word documents, pictures, movies) 
+ 	-> data is spread across multiple devices across multiple facilities
+ 	-> files can be anywere between 0 bytes to 5TB		
+ 	-> files are stored in buckets(folder)
+ 	-> has universal namespace -> names must be unique globally
+ 	-> we will receive http status 200 if upload is successful
+ 	-> By default all buckets when created are private
+
+   -> S3 Object
+ 	-> key => name of the object
+ 	-> value => data made up of a sequence of bytes
+ 	-> version id => for versioning (S3 allows multiple versions of an object)
+ 	-> metadata => data about data
+ 	-> subresources
+ 		-> Access Control Lists -> permissions of that object , locking can be done at bucket level and also at object level
+ 		-> Torrent
+
+   -> S3 data consistency
+    -> read after write consistency for PUTs of new objects
+    -> eventual consistency for updates(overwrite puts and deletes -> can take some time to propogate)
+
+  S3 guarentees
+  	-> 99.9% availability
+  	-> 99.999999999% durability
+
+  S3 features	
+  	-> has tiered storage
+  	-> lifecycle management 
+  		-> automates moving your objects between the different storage tiers
+  		-> can be applied to current versions and previous versions	
+  	-> versioning
+  		-> great backup tool
+ 		-> once enabled , it can only be suspended and not disabled, great backup tool
+ 		-> integrates with lifecycle rules
+  	-> encryption
+  		-> encryption in transit -> when using https -> achieved by ssl/tls
+  		-> encyrption at rest -> server side
+					  			-> s3 managed keys - sse-s3 => amazon manages the keys for you
+					  			-> aws key management service - sse-kms => you and amazon manage the keys together
+					  			-> server side encryption with customer provided keys - sse-c => you give your own keys to amazon
+  							  -> client side	
+  	-> mfa to delete objects
+  	-> data security using ACL and bucket policies
+
+ S3 Storage Classes -> Tiers
+	-> S3 standard -> designed to sustain loss of 2 facilities concurrently
+	-> S3 IA -> designed for data that is accessed less frequently , but requires rapid access when needed. Lower fee than S3 but charges a retrieval fee
+	-> S3 IA One Zone -> low cost option for IA data. Only 1 Availability Zone
+	-> S3 Intelligent Tiering -> how often you use your objects and will move your objects around different storage classes (most cost effective without performance impact or operational overhead) 
+	-> S3 Glacier -> data archiving for any amount of data with retrieval times configurable from minutes to hours at cheap costs than on-premises solutions
+	-> S3 Glacier Deep Archive -> lowest cost storage class with retrieval time of 12 hours
+ Tiering can be done at object or bucket level.	
+
+ S3 is charged on the basis of
+ 	-> Storage
+ 	-> Requests
+ 	-> Storage Management Pricing
+ 	-> Data Transfer Pricing
+ 	-> Transfer Acceleration -> fast, easy and secure transfer of files between end users and S3 bucket -> makes use of CloudFront's globally distributed edge locations -> data routing happens through an 
+ 	   optimized path 
+ 	-> Cross Region Replication Pricing
+
+ S3 is not suitable to support OS installation as it is not block based storage
+ go through s3 faqs
+
+ S3 buckets can be configured to create access logs which log all requests made to the bucket. This can be sent to another bucket in the same or different account.
+
+
+
+
+ 	
+
+
+
+
+
+
+
+
+
