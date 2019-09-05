@@ -1,1 +1,59 @@
+Redhat Enterprise linux officially supports 22 languages
+The linux command line is provided by a program called shell. Shell is a command interpreter.
+Over many UNIX like systems, many shells have been developed. The default shell for Enterprise Linux is the GNU bourne-again shell. Bash is an improved version of one of the most successful shells used on UNIX like systems, the Bourne Shell(sh)
+
+Shell prompt shows that the shell is waiting for a command denoted by $
+$ is replaced by # if the user is the root user
+bash is the default shell in Mac OS X
+
+Users can access the bash shell through a terminal. It can be done through a physical console or virtual console.
+Physical console is the hardware display and keyboard used to interact with the system.
+The terminal is an interface that provides a display for output and a keyboard for input to a shell session. Terminal access can be configured through serial ports
+The physical console supports multiple virtual consoles which act like separate terminals. Each virtual console supports an independant login session.
+
+Commands entered at the shell prompt have 3 basic parts:
+ -> Command to run
+ -> Options to adjust the behaviour of the command
+ -> Arguements which are typically targets of the command
+Options normally start with - or --
+
+=> usermod -L morgan -> lock the password on user morgan's account
+
+=> most commands have --help option
+    -> this contains usage statements
+	 	-> [] surround optional items
+	 	-> anything followed by ... represents an arbitrary-length list of items of that type
+	 	-> multiple items separated by | means only one of them can be specified
+	 	-> text in <> represents variable data
+
+eg: date [OPTION]... [+FORMAT] -> this indicates that a date can take an optional list of options followed by an optional format string prefixed with a + character
+
+=> exit command terminates the current shell session (or ctrl+d)
+
+The default desktop environment in RedHat enterprise linux is provided by GNOME 3. It provides an integrated desktop for users and a unified development platform on top of a graphical framework provided by the X Window System.
+
+Workspaces are separate desktop screens which have different application windows. These can be used to organize the working environment by grouping open application windows by task. for eg. windows being used to perform a particular system maintenance activity.
+
+Commands are the names of the programs installed on the system
+More than 1 command on a single line can be delimited by ;. A ; is a member of a class of characters called metacharacters that has special meanings for bash.
+
+=> superuser can use passwd command to change other user's passwords
+=> file command scans the beginning of a file's contents and displays what type it is. for eg. file /etc/passwd
+=> head and tail commands display the beginning and ends of a file respectively. for eg. head -n 100 abc.txt, tail -n 100 abc.txt
+=> wc command counts lines, words or characters with the options -l, -w and -c respectively. for eg. wc -l abc.txt, wc -w abc.txt, wc -c abc.txt
+=> useradd command is used by the superuser, root to create additional users on the system
+tab can be used for autocompleting options also after a - or --
+=> history command displays a list of all previously executed commands prefixed with a command number
+=> ! is a metacharacter used to expand previous commands without having to retype them, !number expands to the command matching the number specified, !string expands to the most recent command that begins with the string specified
+
+ctrl+a jump to beginning of command line
+ctrl+e jump to end of command line
+ctrl+u clear from the cursor to the beginning of the command line
+ctrl+k clear from the cursor to the end of the command line
+ctrl+left arrow jump to the beginning of the previous word on the command line
+ctrl+right arrow jump to the end of the next word on the command line
+ctrl+r search the history list of commands for a pattern
+
+ 
+
 
