@@ -54,6 +54,212 @@ ctrl+left arrow jump to the beginning of the previous word on the command line
 ctrl+right arrow jump to the end of the next word on the command line
 ctrl+r search the history list of commands for a pattern
 
- 
+Linux File System Heirarchy
+-> single inverted tree of directories.
+-> the directory / is the root directory at the top of the FSH, / character is also used as a directory separator in file names.
+-> subdirectories of / are used for standardized purposes to organize files by type and purpose.
+
+Following terms are encountered  in describing file system heirarchy:
+-> static is content that remains unchanged until explicitly edited or reconfigured.
+-> dynamic or variable is content typically modified or appended by active processes.
+-> persistent is content, particularly configuration settings, that remain after a reboot.
+-> runtime is process or system-specific content or attributes cleared during reboot.
+
+/usr -> installed softwares, shared libraries, include files and static read-only program data.
+	-> /usr/bin -> user commands
+	-> /usr/sbin -> system administration commands
+	-> /usr/local -> locally customized software
+
+/etc -> configuration files specific to this system
+
+/var -> variable data specific to this system that should persist between boots. Files that dynamically change eg. databases, cache directories, log files, printer spooled documents, and website content.
+
+/run -> runtime data for processes started since the last boot. This includes process ID files and lock files. The contents of this directory are recreated upon reboot. This directory consolidates /var/run and /var/lock from older versions of Enterprise Linux.
+
+/home -> home directories where regular users store their personal data and configuration files
+
+/root -> home directory for the administrative superuser, root.
+
+/tmp -> Writable space for temporary files. Files more than 10 days old are deleted from this directory automatically. Another temporary directory /var/tmp in which files that have not been accessed, changed or modified in more than 30 days are deleted automatically.
+
+/boot -> Files needed in order to start the boot process
+
+/dev -> contains special device files which are used by the system to access hardware
+
+bin, sbin, lib, lib64 have been moved from / to /usr/ from older versions of linux by using symlinks(symbolic links)
+
+file names in linux are case sensitive
+
+=> pwd command -> present working directory
+=> ls command -> lists all files in that location -> options include -l(long listing), -a(include hidden files), -R(recursive)
+=> cd command -> change directories
+
+~ -> users current home directory 
+
+=> touch command -> updates a file's timestamp to the current date and time without otherwise modifying it, otherwise creates an empty file
+
+. -> current directory
+.. -> parent directory
+
+these special directories exist in every directory of the system
+
+hidden files are not a security feature. They keep necessary user configuration files from cluttering home directories. Many commands process hidden files only with specific command line options, preventing one user's configuration from being accidentally copied to other directories or users.
+
+To protect a file's contents from improper viewing requires the use of file permissions.
+
+=> cd - command changes directory to the directory where the user was previous to the current directory.
+=> cd .. command uses the .. hidden directory to move up one level to the parent directory without needing to know the exact parent directory name.
+=> cp -> copy file, cp -r -> copy directory, in any destination, new file names must be unique, if not then the copy command will overwrite the existing file
+=> rm -> remove file, rm -r -> remove directory
+=> mv -> move file, mv -> move directory
+=> mkdir -> creates one or more directories or subdirectories, mkdir -p /par1/par2/dir -> -p option creates missing parent directories for the requested destination, if the parent directories exist in the destination path then -p option is not required.
+=> mv dir1 dir2 -> if dir2 exists the result is a move, if not then the result is a rename.
+
+There is no command line undelete feature, nor a trash bin from which to restore
+
+=> rm -i will interactively prompt for each deletion, this is opposite from -f which will forcefully delete without prompting the user
+=> rmdir command deletes empty directories
+
+The bash shell has a path name matching capability called globbing.
+Globbing is a shell command parsing operation that expands a wildcard pattern into a list of matching path names.
+
+Regex pattern matching in linux
+-> * -> matches anything
+-> ? -> matches one character
+-> [abc...] -> any one character in the enclosed class
+-> [!abc...] -> any one character not in the enclosed class
+-> [[:alpha:]] -> any alphabetic character 
+-> [[:lower:]] -> any lowercase character
+-> [[:upper:]] -> any uppercase character
+-> [[:alnum:]] -> any alphabetic character or digit
+-> [[:digit:]] -> any digit 0-9
+-> [[:space:]] -> any one whitespace character
+
+Brace Expansion
+echo {Sunday,Monday,Tuesday,Wednesday}.log -> Sunday.log Monday.log Tuesday.log Wednesday.log
+echo file{1..3}.txt -> file1.txt file2.txt file3.txt
+echo file{a..c}.txt -> filea.txt fileb.txt filec.txt
+echo file{a,b}{1,2}.txt -> filea1.txt filea2.txt fileb1.txt fileb2.txt
+echo file{a{1,2},b,c}.txt -> filea1.txt filea2.txt fileb.txt filec.txt
+
+Command Substitution
+$(command) -> echo The Time is ${date}
+
+Protecting arguements from expansion
+\ is an escape character for metacharacters in bash protecting the single following character from special interpretation
+use "" to suppress globbing and shell expansion -> echo "*** hostname is ${host} ***" -> *** hostname is desktopx ***
+use '' to interpret all text literally -> echo "Will $host evaluate to $(hostname)?" -> Will desktopx evaluate to desktopx?
+											   'Will $host evaluate to $(hostname)?' -> Will $host evaluate to $(hostname)?
+
+Sections of the Linux manual
+Section Content type
+1       User commands(both executable and shell programs)
+2       System calls (kernel routines invoked from user space)
+3       Library functions (provided by program libraries)
+4       Special files (such as device files)
+5       File formats (for many configuration files and structures)
+6       Games (historical section for amusing programs)
+7       Conventions . standards , and miscellaneous (protocols, file systems)
+8       System administration and privileged commands (maintenance tasks)
+9       Linux kernel API (internal kernel calls)
+		
+=> man 1 su, man 1 passwd, man -f passwd, man -k zip, man -k boot, man -k ext4 commands
+=> passwd -l username -> locks the user's account
+=> passwd -u username -> unlocks the user's account
+
+Man pages have a formal format useful as a command reference, but less useful as general documentation. For such documents, the GNU Project developed a different online documenation system known as GNU info. Info documents allow thorough discussion of complex commands and concepts.
+
+=> pinfo tar, info tar, pinfo info, pinfo pinfo, man tar
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
