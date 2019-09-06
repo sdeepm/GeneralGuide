@@ -171,6 +171,85 @@ Man pages have a formal format useful as a command reference, but less useful as
 
 => pinfo tar, info tar, pinfo info, pinfo pinfo, man tar
 
+In addition to man and pinfo, developers may also choose to include documentation in their application's RPM distribution package. When the package is installed, files recognized as documentation are moved to /usr/share/doc/packagename
+
+=> firefox file:///usr/share/doc, less and gedit can also be used
+
+The kernel itself has a significant documentation package. The kernel-doc package is a treasure of kernel, driver, tuning and advanced configuration information. Experienced system administrators regularly research kernel-doc files.
+
+=> less /usr/share/doc/vim-common-*/README.txt
+=> less yum-3*/README
+=> ls -l bc-*/Examples
+=> firefox grub2-tools-*/grub.html
+=> yum list *-doc*
+
+use yum to display only those packages that contain "-doc", "-docs", "-documentation" in the package name.
+
+RedHat customer portal (https://access.redhat.com, https://access.redhat.com/help, https://access.redhat.com/site/support/policy/support_process) provides customers with access to everything provided with their subscription through one convenient location.
+-> customers can search for solutions, FAQs and articles through KnowledgeBase.
+-> access to official product documentation is provided.
+-> support tickets can be submitted and managed.
+-> subscriptions to RedHat products can be attached and detached from registered systems.
+-> software downloads, updates and evaluations can be obtained.
+
+=> redhat-support-tool -> raise a bug to redhat
+=> sosreport command, tar -xvJf /var/tmp/sosreport-*.tar.xz command -> diagnostic information, kdump
+
+Processes connect to files using standard connections 0,1,2 for stdin(standard input), stdout(standard output) and stderr(standard error) respectively. Processes use channels 3 and above to connect with other files.
+
+Redirecting stdout suppresses process output from appearing on the terminal. Redirecting only stdout does not suppress stderr error messages from displaying on the terminal.
+
+>file -> redirect stdout to a file
+>>file -> redirect stdout to a file, append to current file content
+2>file -> redirect stderr to a file
+2>/dev/null -> discard stderr error messages by redirecting to a special file /dev/null
+&>file -> combine stdout and stderr to 1 file
+>>file 2>&1 or &>>file-> combine stdout and stderr, append to current file content
+
+=> diff prevfile currfile >> /tmp/tracking-changes -> appends process output to an existing file
+=> find /etc -name passwd 2> /tmp/errors -> redirect errors to a file while viewing normal command outputs
+=> find /etc -name passwd > /tmp/output 2> /tmp/errors -> save process output and error messages to separate files
+=> find /etc -name passwd > /tmp/output 2> /dev/null -> save process output and ignore and discard error messages
+
+Redirection controls channel output to or from files while piping sends channel output to another process.
+
+=> ls | ws -l > /tmp/countfiles -> count number of lines in an output or listing
+=> ls -l | tee /tmp/saved-output -> the tee command displays or redirects the intermediate result normally suppressed due to piping.
+=> tty -> ?
+
+The key design principle of Linux is that information is stored in text based files. Text files include both flat files with rows of similar information such as configuration files in /etc and Extensible Markup Language(XML) files which define data structure through text tags seen in application configuration files throughout both /etc and /usr. The advantage of text files is that they can be shared and moved between systems without conversion. They can also be viewed and edited using any simple text editor.
+
+Vim is an improved version of the vi text editor distributed with Linux and Unix Systems.
+i key -> insert mode
+esc key -> command mode
+v key -> visual mode
+  -> V -> multi line 
+  -> ctrl+v -> block selection
+  -> v, V, ctrl+v -> exit visual mode
+: key -> begins extended command mode for tasks like writing the file to save it, and quitting the vim editor
+:w -> write(save) the file and remain in command mode for more editing
+:wq -> write the file and quit vim
+:q! -> quit vim, but discard all file changes since the last write
+
+In vim copy and paste is called yank and put using command characters y and p
+
+refer http ://www.vim.org/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
