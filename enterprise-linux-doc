@@ -222,7 +222,7 @@ The key design principle of Linux is that information is stored in text based fi
 Vim is an improved version of the vi text editor distributed with Linux and Unix Systems.
 i key -> insert mode
 esc key -> command mode
-v key -> visual mode
+v key -> single line visual mode
   -> V -> multi line 
   -> ctrl+v -> block selection
   -> v, V, ctrl+v -> exit visual mode
@@ -234,6 +234,238 @@ v key -> visual mode
 In vim copy and paste is called yank and put using command characters y and p
 
 refer http ://www.vim.org/
+
+=> vimtutor command -> learn more about vim
+=> gedit abc.txt &
+
+Every process on the system runs as a particular user. Every file is owned by a particular user. Access to files and directories are restricted by user. The user associated with a running process determines the files and directories accessible to that process.
+
+=> id command -> used to show information about the current logged-in user. Basic information about another user can also be requested by passing in the username of that user as the first arguement to the id command.
+
+=> ps command -> to show process information in the current shell by default. Add -a to view all processes with a terminal. To view user associated with the processes include -u .
+
+Internally the operating system tracks users by UID number. The mapping of names to UIDs are defined in databases of account information. 
+By default systems use a flat file, the /etc/passwd file to store information about local users.
+
+Format of /etc/passwd file -> username:password:UID:GID:GECOS:/home/dir:shell
+	->passwords are stored in a separate file /etc/shadow
+	->GID -> primary group id
+	->GECOS -> includes user's real name
+Like users, groups have a name and a number. Local groups are defined in /etc/group
+
+Every user has exactly 1 primary group. Normally the primary group owns new files created by the user. Normally the primary group of a newly created user is a newly created group with the same name as the user. The user is the only member of this User Private Group(UPG)
+Users may be a member of 0 or more supplementary groups.
+
+Format of /etc/group -> groupname:password:GID:list of users in this group
+Supplementary group membership is used to help ensure that users have access permissions to files and other resources on the system.
+
+Most operating systems have some sort of a superuser, a user that has all power over the system. This user in RHEL is the root user. This user has the power to override normal privileges on the file system, and is used to manage and administer the system. In order to perform tasks such as installing or removing software and to manage system files and directories, a user must escalate privileges to the root user.
+Only root user is allowed to manage fixed hard drives whereas anyone can manage USBs or removable devices.
+The root account in Linux is roughly equivalent to the local administrator account on windows. In Linux most system administrators log into an unprivileged user account and use various tools to temporarily gain root privileges.
+
+=> su, sudo, PolicyKit -> temporarily gain superuser privileges
+=> su username command -> Starts a non login shell, starts a shell as a user with the current environment settings
+=> su - username -> starts a login shell, clean login as a user
+=> su -> switch to root user
+=> sudo command -> allows a user to be permitted to run a command as root, or as another user, based on settings in the /etc/sudoers file. Unlike other tools such as su, sudo requires users to enter their own password for authentication, not the password of the account they are trying to access. This allows the administrator to hand out fine grained permissions to users to delegate system administration tasks, without having to hand out the root password. All commands executed using sudo are logged by default to /var/log/secure.
+All members of group wheel can use sudo to run commands as any user, including root.
+pkexec and polkit
+
+=> useradd username command sets reasonable defaults for all fields in /etc/passwd when run without options. The command does not set any valid password by default, the user cannot login until a password is set.
+=> usermod command -> modify an existing user, some defaults like the range of valid UIDs and password aging rules are read from the /etc/login.defs. Values in these files are only used when creating new users. A change to this file will have any effect on any existing users.
+
+=> userdel username -> removes the user from /etc/passwd, but leaves the home directory intact by default, -r option removes the user and the user's home directory, without -r option, the system will have files that are owned by an unassigned user ID number. 
+the useradd command assigns new users the first free UID number available in the range starting from UID 1000 or above(unless -u option is provided)
+
+when a user is deleted his UID can be assigned to another user making the new user the owner of the files the old user created.
+find / -nouser -o -nogroup 2> /dev/null => find all unowned files and directories  
+
+id => displays UID and group membership.
+id username => displays user information including UID and group membership.
+passwd username => can be either used to set the user's initial password or change that user's password
+
+The root user can set a password to any value. A regular user must choose a password which is atleast 8 characters long and is not a dictionary word, the username or the previous password.
+
+UID 0 is always assigned to the superuser account, the root.
+UID 1-200 is a range of system users assigned statically to system processes by RedHat
+UID 201-999 is a range of system users used by system processes that do not own files on the file system. They are typically assigned dynamically from the available pool when the software that needs them is installed. Programs run as these unprivileged system users in order to limit their access to just the resources they need to function.
+UID 1000+ is the range available to assign to regular users.
+
+default ranges used by useradd and groupadd can be changes in the /etc/login.defs file
+
+A group must exist before a user can be added to that group.
+groupadd groupname => uses the next available GID from the range specified in the /etc/login.defs file. -g option is used to specify a specific GID.
+
+groupmod => used to change a groupname to a GID mapping. -n option is used to specify a new name. -g option is used to specify a new GID
+(groupmod -n javaapp appusers, groupmod -g 6000 ateam)
+groupdel => removes a group
+
+A group may not be removed if it is the primary group of any existing user. As with userdel, check all file systems to ensure that no files remain owned by the group.
+
+usermod -g student student => change a user's primary group
+usermod -aG groupname username => add a user to a supplementary group 
+-a option makes usermod function in append mode. Without it the user will be removed from all other supplementary groups.
+
+/etc/shadow file were more secure as they prevented dictionary attacks on encrypted passwords kept in the world-readable /etc/passwd file. This new file also allowed password aging and expiration features to be implemented.
+
+There are 3 pieces of information stored in a modern password hash
+1. The hashing algorithm. 1 indicates an MD5 hash. 6 indicates SHA-512 hash. 5 indicates SHA-256 hash.
+2. The salt used to encrypt the hash. This is originally chosen at random. The use of a salt prevents 2 users with the same password from having identical entries in the /etc/shadow file.
+3. The encrypted hash
+
+=> authconfig --passalgo md5/sha256/sha512 -> change default algorithm used for password hashes
+
+Format of /etc/shadow 
+name:password:lastchange:minage:maxage:warning:inactive:expire:blank
+the password field which starts with ! means that the password is locked
+the date of the last password change, represented as the number of days since 1970.01.01
+minimum number of days before a password may be changed where 0 means no age requirement
+maximum number of days before a password must be changed
+the warning period that a password is about to expire. represented in days. 0 means no warning given 
+the number of days an account remains active after a password has expired. A user may still log into the system and change the password during this period. After the specified number of days, the account is locked, becoming inactive.
+the account expiration date, represented as the number of days since 1970.01.01
+this blank field is reserved for future use
+
+=> chage command -> to change password aging policy
+=> chage -d 0 username -> will force a password update on next login 
+=> chage -l username -> list a username's current settings
+=> chage -E YYYY-MM-DD -> will expire an account on a specific day
+
+=> date -d "+45 days" -> calculates a date 45 days in future
+
+=> usermod -L -e 1 username -> When a user has left the company, the administrator may lock and expire an account with a single usermod command. 
+
+sometimes a user needs an account with a password to authenticate to a system, but does not need an interactive shell on the system. For eg. a mail server may require an account to store mail and a password for the user to authenticate with a mail client used to retrieve mail. That user does not need to log directly into the system. The solution to this problem is to set the user's login shell to /sbin/nologin. If the user tries to login to the system directly, the nologin shell will simply close the connection.
+
+use of the nologin shell prevents interactive use of the system, but does not prevent all access. A user may still be able to authenticate and upload or retireve files through applications such as web applications, file transfer programs, or mail readers.
+
+Access to files by users are controlled by file permissions. The file is owned by a user, normally the one who created the file. The file is also owned by a single group, usually the primary group of the user who created the file, but this can be changed. Default permissions can be set for the owning user, the owning group, and for all other users on the system that are not the user or a member of the owning group.
+
+The most specific permissions apply. So user permissions override group permissions, which override other permissions.
+
+r->read,w->write,x->execute . If a user has only exec access on a directory, they cannot list the names of the files in the directory, but if they already know the name of a file which they have permission to read, then they can access the contents of that file by explicitly specifying the file name.
+
+A file may be removed by anyone who has write permissions to the directory in which the file resides, regardless of the ownership or permissions on the file itself. This can be overridden with a special permission.
+
+write permission on directories include the ability to delete files and subdirectories.
+
+rwxrwxr-x  ricky ricardo dir
+	rw-rw-r-- lucy lucy file1
+	rw-r--rw- lucy ricardo file2
+	rw-rw-r-- ricky ricardo file3
+	rw-r----- ricky ricardo file4
+
+	ricky is a member of the group ricardo, and that group has read-only permissions on file2. Even though other has write permissions, group permissions take precedence
+	ricky has write permissions on the directory containing all files. He can delete any file in the directory 
+	ethel can change the contents of file2, since she is not a member of the ricardo group, other permissions apply for her
+	lucy can change the contents of file3. Since she is a member of the ricardo group. That group has both read and write permissions on file3
+
+=> chmod -> command use to change permissions from the command line short for 'change mode' -> permissions are also called the mode of the file. The instruction can be given symbolically or numerically.
+u, g, o, a stand for user, group, other, all
++, -, = mean add permissions to a set, remove permissions from a set, set permissions exactly to a set
+r, w, x mean read write and executable
+r=4, w=2, x=1
+
+=> chmod -R -> recurseively sets permissions on an entire directory tree
+=> chmod -R g+rwX demodir -> X permission instead of x permission indicates that execute permissions should only be set on directories and not regular files
+
+execute is the traversal permission in a directory. It allows you to access files and folders within a directory
+
+=> chown foofile student -> to change file ownership for foofile to student
+-R -> recurseively change the ownership of an entire directory tree
+
+=> chown visitor:guest dir -> change both the owner and the group of a directory at the same time.
+Only root can change ownership of a file. Group ownership can be set by root or the file's owner.
+root can grant ownership to any group. non-root users can grant ownerships only to groups they belong to.
+=> chgrp -> chown -R
+
+setuid or setgid permission on an executable file means that the command will run as the user(group) of the file and not the user that ran the command.
+setgid on a directory means that files created in the directory will inherit the group affiliation from the directory, rather than inheriting it from the creating user. This is commonly used on group collaborative directories to automatically change a file from the default private group to the shared group
+
+u+s -> file executes as the user that owns the file, not the user than ran the file, no effect on directories
+g+s -> file executes as the group that owns the file, files newly created in the directory have their group owner set to match the group owner of the directory
+eg. ls -l /usr/bin/passwd
+o+t -> no effect on files, users with write on the directory can only remove files that they own, they cannot remove or force saves to files owned by other users
+eg. ls -ld /tmp
+
+setuid -> u+s -> 4
+setgid -> g+s -> 2
+sticky -> o+t -> 1
+
+=> chmod 2770 directory -> sets gid bit, and read/write and execute for user and group on the directory
+=> chmod g+s directory -> add the setgid bit on directory
+
+The default permissions for files are set by processes that create them. for eg. text editor creates files so they are only readable and writable and not executable by everyone. The same goes for shell redirection. Binary executables are created executable by the compilers that create them. 
+
+=> umask command without arguements will display the current value of the shell's umask.
+Every process on the system has a umask, which is an octal bitmask that is used to clear the permissions of new files and directories that are created by a process. A umask of 0002 clears the write bit for other users. A umask of 077 clears all the group and other permissions of newly created files.
+
+The system default umask values for bash shell users are defined in the /etc/profile and /etc/bashrc files. Users can override the system defaults in their .bash_profile and .bashrc files
+=> umask 027 -> sets the umask to 027
+All preceding missing numbers will be set to 0
+
+A process is a running instance of a launched, executable program. A process consists of :
+	-> an address space of allocated memory
+	-> security properties including ownership credentials and privileges
+	-> 1 or more execution threads of program code
+	-> the process state
+
+The environment of a process includes:
+	-> local and global variables
+	-> a current scheduling context
+	-> allocated system resources, such as file descriptors and network ports
+
+An existing parent process duplicates its own address space(fork) to create a new child process structure. Every new process is assigned a unique process ID (PID) for tracking and security. The PID and the parent process ID (PPID) are elements of the new process environment. Any process may create a child process. All processes are descendants of the first system process, which is systemd 
+
+=> ps command is used for listing current processes :
+ -> UID -> determines process privileges
+ -> PID -> process identification id
+ -> cpu and real time already expended
+ -> how much memory the process has allocated in various locations
+ -> location of process stdout, known as controlling terminal
+ -> the current process state
+
+ => ps aux
+ => ps lax
+ => ps -ef
+
+ ps with no options selects all processes with the same effective user id as current user and associated with the same terminal where ps was invoked.
+ -> processes in brackets are scheduled kernel threads
+ -> zombies show up in a ps listing as exiting or defunct(zombie is a state of a process wherein it gives up all its resources except the PID)
+
+ => top command -> repetitive update process display
+  ps can display in tree format to view parent/child relationships
+
+ Job control is a command shell feature allowing a single shell instance to run and manage multiple commands. Without job control, a parent shell forks a child process to run a command sleeping until the child process exits. When the shell prompt redisplays, the parent shell has returned. With job control, commands can be selectively suspended, resumed and run asynchronously, allowing the shell to return for additional commands while child processes run. 
+ 
+ A foreground process is a command running in a terminal window. The terminal's device id(tty) is the process's controlling terminal. Foreground processes receive keyboard generated input and signals and are allowed to read from or write to the terminal(stdin or stdout).
+
+ A process session is created when a terminal or console first opens(eg. at login or by invoking a new terminal instance). All processes(first command shell, its children and pipelines ) initiated from that terminal share the same session id. Within a session, only 1 process can be in the foreground at a time.
+
+ A background process is started without a controlling terminal because it has no need for terminal interaction. In a ps listing, such processes (eg. service daemons and kernel process threads) display a ? in the tty column. Background processes which (improperly)attempt to read from or write to the terminal may be suspended.
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
