@@ -444,7 +444,358 @@ An existing parent process duplicates its own address space(fork) to create a ne
 
  A background process is started without a controlling terminal because it has no need for terminal interaction. In a ps listing, such processes (eg. service daemons and kernel process threads) display a ? in the tty column. Background processes which (improperly)attempt to read from or write to the terminal may be suspended.
 
-    
+Any command can be started in the background by appending an & to the command line. The bash shell displays a job number(unique to the session) and the PID of the new child process. The command shell does not wait for the child process and redisplays the shell prompt.
+An & will background only the last command in a pipeline, unless the command set is surrounded with parentheses. The PID returned is from the pipeline's last process. All processes in the pipeline are now members of the same job.
+
+=> jobs -> shows jobs per session
+=> sleep 10000 & -> puts command shell in sleep mode
+
+=> fg %1 -> Background jobs can reconnect to the controlling terminal by being brought to the foreground using the fg command with the job ID (%job number)
+To resend to the background, or to send any command in which the trailing ampersand was not originally included, send keyboard generated suspend request (ctrl+z) to the process.
+=> bg %1 -> restarts the background process.
+
+A signal is a software interrupt delivered to a process. Signals report events to an executing program. Events that generate a signal can be an error, external event, or by explicit request. 
+
+Each signal has a default action :
+term - causes a program to terminate at once
+core - causes a program to save a memory image(core dump) then terminate
+stop - causes a program to stop executing(suspend) and waiting to continue(resume)
+
+ctrl+z -> suspend
+ctrl+c -> kill
+ctrl+\ -> core dump 
+
+To signal a background process or processes in a different session requires a signal-sending command.
+Users may kill their own processes, but root privilege is required to kill processes owned by others.
+1 SIGHUP,2 SIGINT,3 SIGQUIT,4 SIGILL,5 SIGTRAP,6 SIGABRT,7 SIGBUS,8 SIGFPE,9 SIGKILL,10 SIGUSR1,11 SIGSEGV,12 SIGUSR2,13 SIGPIPE,14 SIGALRM,15 SIGTERM,16 SIGSTKFLT,17 SIGCHLD,18 SIGCONT,19 SIGSTOP,20 SIGTSTP
+
+=> kill PID -> kill command can be used for sending any signal, not just those for terminating programs
+=> kill -signal PID
+
+=> killall command_pattern -> send a signal to 1 or more processes matching selection criteria, such as a command name, processes owned by a specific user or all system-wide processes
+=> killall -signal command_pattern
+=> killall -signal -u username command_pattern
+
+=> pkill command -> like killall can signal multiple processes, uses advanced selection criteria which can include combinations of :
+	-> command -> processes with a pattern matched command name
+	-> UID -> processes owned by a linux user account, effective or real
+	-> GID -> processes owned by a linux group account, effective or real
+	-> parent -> child processes of a specific parent process
+	-> terminal -> processes running on a specific controlling terminal
+=> pkill -signal command_pattern
+=> pkill -G GID command_pattern
+=> pkill -P PPID command pattern
+=> pkill -t terminal_name -U UID command_pattern
+
+=> w command views users currently logged into the system and their cumulative activities. use the tty and from columns to determine the user's location
+All users have a controlling terminal, listed as pts/N while working in a graphical environment window or ttyN on a system console.
+Remote users display their connecting system name in the FROM column when using the -f option.
+For each session, CPU resources consumed by current jobs, included background tasks and children, are in the JCPU column. Current foreground process CPU consumption is in the PCPU column.
+
+When situations occur in which users cannot be contacted or have unresponsive sessions, runaway resource consumption, or improper system access. their sessions may need to be administratively terminated using signals.
+
+Although SIGTERM is the default signal, SIGKILL is a commonly misused administrative favourite. Since the SIGKILL signal cannot be handled or ignored, it is always fatal. However it forces termination without allowing the killed process to run self-cleanup routines. It is recommended to send SIGTERM first, then retry with SIGKILL only if a process fails to respond.
+
+=> pkill -SIGKILL -u username -> kills all of a user's processes and login shells.
+=> pkill -SIGKILL -t tty3 -> causes the terminal to close abruptly
+=> pgrep -l -u username -> view all of a user's processes
+=> pstree command -> view a process tree for the system or a single user
+killing a parent process will kill all its child processes
+=> pstree -p username
+
+=> kill -SIGSTOP %number -> suspend a process using signal
+=> kill -SIGTERM %number -> kill a process using signal
+=> kill -SIGCONT %number -> resume a process using signal
+
+The linux kernel calculates a load average metric as an exponential moving average of the load number, a cumulative CPU count of active system resource requests.
+-> Active requests are counted from per-CPU queues for running threads and threads waiting for I/O, as the kernel tracks process resource activity and corresponding process state changes
+-> Load number is a calculation routine run every 5 seconds by default, which accumulates and averages the active requests into a single number for all CPUs
+-> Exponential moving average is a mathematical formula to smooth out trending data highs and lows, increase current activity significance, and decrease aging data quality 
+-> Load average is the load number calculation routine result. Collectively, it refers to the 3 displayed values of system activity data averaged for the last 1, 5 and 15 minutes. It represents the percieved system load over a time period. Linux implements the load average calculation as a representation of expected service wait times, not only for CPU but also for disk and network I/O
+
+Linux counts not only processes, but threads individually as separate tasks. 
+Linux counts each physical CPU core and microprocessor hyperthread as separate execution units, logically represented and referred to as individual CPUs. Each CPU has independant request queues.
+/proc/cpuinfo for the kernel representation of system CPUs
+
+=> top, uptime, w and gnome-system-monitor display load average values. 
+Divide the displayed load average values by the number of logical CPUs in the system. A value below 1 indicates satisfactory resource utilization and minimal wait times. A value above 1 indicates resource saturation and some amount of service waiting times
+
+An idle CPU queue has a load number of 0. Each ready and waiting thread adds a count of 1. With a total queue count of 1, the resource is in use, but no requests spend time waiting. Additional requests increment the count, but since many requests can be processed within the time period, resource utilization increases, but not wait times.
+
+Unlike the static ps output, top continuously refreshes at a configurable interval and provides capabilites for column reordering, sorting and highlighting. User configurations can be saved and made persistent.
+ -> PID
+ -> UID
+ -> VIRT -> virtual memory is all memory the process is using, including the resident set, shared libraries, and any mapped or swapped memory pages.
+ -> RED -> resident memory is the physical memory used by the process, including any resident shared objects.
+
+->Process state displays as :
+ -> D -> uniterruptible sleeping
+ -> R -> Running or Runnable
+ -> S -> Sleeping
+ -> T -> Stopped or Traced
+ -> Z -> Zombie
+
+-> CPU Time is the total processing time since the process has started. May be toggled to include cumulative time of all previous children.
+
+-> The process command name  
+
+The default configuration file is .toprc in the current user's home directory.
+
+Press P to sort by cpu utilization
+Press B to toggle bole use on 
+Press M to save the configuration
+Press q to quit current display
+
+System startup and server processes are managed by systemd System and Service Manager. This program provides a method for activating system resources, server daemons, and other processes both at boot time and on a running system.
+
+Daemons are processes that wait or run in the background performing various tasks. Generally daemons start automatically at boot time and continue to run until shutdown or until they are manually stopped. By convention, the names of many daemon programs end in the letter d.
+
+To listen for connections, a daemon uses a socket. This is the primary communication channel with local or remote clients. Sockets may be created by daemons or may be separated from the daemon and be created by another process, such as systemd. The socket is passed to the daemon when a connection is established by the client.
+
+A service often refers to 1 or more daemons, but starting or stopping a service may instead make a 1 time change to the state of the system, which does not involve leaving a daemon process running afterward(called oneshot).
+
+For many years process id 1 of Linux and Unix system has been the init process. This process was responsible for activating other services on the system and is the origin of the term init system. Frequently used daemons were started on systems at boot time with System V and LSB init scripts. Less frequently used daemons were started on demand by another service, such as initd or xinetd, which listens for client connections. These systems have several limitations, which are addressed by systemd.
+
+Process ID 1 in RHEL7 is systemd, the new init system. Few of the new features provided by systemd include:
+ -> parallelization capabilites, which increase boot speed of the system
+ -> on demand starting of daemons without requiring a separate service
+ -> automatic service dependency management, which can prevent long timeouts, such as by not starting a network service when the network is not available
+ -> a method of tracking related processes together by using Linux Control Groups.
+
+ The systemctl command is used to manage different types of systemd objects, called units. 
+ => systemctl -t help -> shows a list of available unit types 
+
+ Some common unit types are listed :
+ 	->Service units have a .service extension and represent system services. This type of unit is used to start frequently accesses daemons, such as web server.
+ 	-> Socket units have a .socket extension and represent inter-process communication sockets. Control of the socket will be passed to a daemon or newly started service when a client connection is made. Socket units are used to delay the start of a service at boot time and to start less frequently used services on demand. These are similar in principle to services which use the xinetd superserver to start on demand.
+ 	-> Path units have a .path extension and are used to delay the activation of a service until a specific file system change occurs. This is commonly used for services which use spool directories, such as printing system. 
+
+ =>	systemctl status name.type -> view the status of a service. for eg. systemctl status sshd.service. -l option will show the full details. If the unit type is not provided, systemctl will show the status of a service unit, if 1 exists.
+ status can also be used to determine if a particular unit is active and show if the unit is enabled to start at boot time.
+ => systemctl is-active sshd -> if system is active 
+ => systemctl is-enabled sshd -> if system is enabled 
+
+ enabled/disabled -> will/will not be started at boot time
+ static -> can not be enabled, but may be started by an enabled unit automatically
+
+-> list the active state of all loaded units
+systemctl list-unitts --type=service
+systemctl list-units --type=service --all -> all option adds inactive results
+
+=> systemctl list-unit-files --type=service -> view the enabled and disabled settings for all units
+=> systemctl --failed --type=service -> view only failed services
+refer http://docs.redhat.com/ for additional information
+=> systemctl reload sshd.service -> reload configuration for sshd service
+=> systemctl restart sshd.service -> restart sshd service
+=> systemctl stop sshd.service -> stop sshd service
+
+Services may be started as dependencies of other services. If a socket unit is enabled and the service unit with the same name is not, the service will automatically be started when a request is made on the network socket.
+
+=> systemctl list-dependencies UNIT command can be used to print out a tree of what other units must be started if the specified unit is started. 
+To prevent an administrator from accidentally starting a service, that service may be masked. Masking will create a link in the configuration directories so that if a service is started, nothing will happen.
+
+=> systemctl mask network -> mask a service
+=> systemctl unmask network -> unmask a service
+
+A disabled service will not be started automatically at boot or by other unit files, but can be started manually. A masked service cannot be started manually or automatically.
+
+Services are started at boot time when links are created in the appropriate systemd configuration directories. These links are created and removed with systemctl commands.
+
+The OpenSSH Secure Shell is used to securely run a shell on a remote system. The ssh can also be used to run an individual command on a remote system.
+
+=> ssh remotehost -> create a remote interactive shell as the current user
+=> ssh remoteuser@remotehost -> connect to a remote shell as a different user(remoteuser) on a selected host(remotehost)
+=> ssh remoteuser@remotehost hostname -> execute the command hostname on the remote host
+
+SSH secures communication through public key encryption. When a SSH client connects to an SSH server, before the client logs in, the server sends it a copy of its public key. The first time a user uses SSH to connect to a particular server, the ssh command stores the server's public key in the user's ~/.ssh/known_hosts file. Every time the user connects after that, the client makes sure it gets the same public key from the server by comparing the server's entry in the ~/.ssh/known_hosts file to the public key the server sent. If the keys do not match, the client assumes that the network traffic is being hijacked or that the server has been compromised and breaks the connection.
+
+Host IDs are stored in ~/.ssh/known_hosts
+Host Keys are stored in /etc/ssh/ssh_host_key* on the ssh server
+see ssh-copy-id(1)
+
+SSH key-based authentication 
+ -> Users can authenticate ssh logins without a password by using public key authentication. ssh allows users to authenticate using a private-public key scheme. This means that 2 keys are generated, a private key and a public key. The private key file is used as the authentication credential, and like a password must be kept secret and secure. The public key is copied to systems the user wants to log into and is used to verify the private key. 
+
+=> ssh-keygen -> generate private-public key pair ~/.ssh/id_rsa, ~/.ssh/id_rsa.pub
+ In the event the private key is stolen, it is very difficult for someone other than the issuer to use it when protected with a passphrase.
+ However passphrase has to be entered whenever the key is used, making the authentication process no longer password less. This can be avoided using ssh-agent, which can be given your passphrase once at the start of the session(using ssh-add), so it can provide the passphrase as needed while you stay logged in. Permissions should be 600 on the private key and 644 on public key. Before key based authentication can be used, the public key needs to be copied on the destination system. This can be done with ssh-copy-id.
+=> ssh-copy-id root@desktopY -> copies the ~/.ssh/id_rsa.pub file by default.
+=> ssh serverX 'hostname' -> display hostname of the serverX machine without the need to enter a password.
+
+Various aspects of the OpenSSH server can be modified in the configuration file /etc/ssh/sshd_config
+
+It is advisable to prohibit the root user from directly logging into the system with ssh 
+ -> root user has unrestricted privileges
+ -> the username root exists on every Linux system by default, so a potential attacker only has to guess the password, instead of a valid username and password combination
+
+The sshd service has to be restarted to put the changes into effect. 
+=> systemctl restart sshd
+
+to allow only key-based ssh login as root with 
+ -> PermitRootLogin without-password
+
+to turn on password authentication 
+ -> PasswordAuthentication yes
+
+key-based logins have various adantages :
+ -> SSH keys are longer than an average password, which adds security.
+ -> less effort to initiate remote shell access after the initial setup.
+
+Any changes to the file will take effect once sshd service is restarted
+
+=> lab ssh setup
+
+Processes and the operating system kernel need to be able to record a log of events that happen. These logs can be useful for auditing the system and troubleshooting problems. By convention, the /var/log directory is where these logs are persistently stored.
+A standard login system based on the syslog protocol is built into RHEL. In RHEL7, syslog messages are handled by 2 services, systemd-journald and rsyslog. 
+
+The systemd-journald daemon provides an improved log management service that collects messages from the kernel, the early stages of the boot process, standard output and error of daemons as they start up and run and syslog. It writes these messages to a structured journal of events, that by default does not persist between reboots. This allows syslog messages and events which are missed by syslog to be collected in 1 central database. The syslog messages are also forwarded by systemd-journald to rsyslog for further processing.
+
+The rsyslog service then sorts the syslog messages by type and priority, and writes them to persistent files in the /var/log directory.
+
+The /var/log directory holds various system and service-specific log files maintained by rsyslog.
+ => /var/log/messages -> Most syslog messages are logged here. The exceptions are messages related to authentication and email processing, that periodically run jobs, and those which are purely debugging related. 
+ => /var/log/secure -> the log file for security and authentication related messages and errors
+ => /var/log/maillog -> the log file for mail server related messages
+ => /var/log/cron -> the log file related to periodically executed tasks
+ => /var/log/boot.log -> messages related to system startup are logged here
+
+ Many programs use the syslog protocol to log events to the system. Each log message is categorized by facility(type of message) and a priority(the severity of the message). The facilities which are available are documented by the rsyslog.conf man page
+
+ Priorities in syslog files are :
+ 0 emerg -> system is unusable
+ 1 alert -> action must be taken immediately 
+ 2 crit -> critical condition
+ 3 err -> non-critical error condition
+ 4 warning -> warning condition
+ 5 notice -> normal but significant event
+ 6 info -> informational event
+ 7 debug -> debugging-level message
+
+The rsyslog service uses the facility and priority of log messages to determine how to handle them. This is configured in the file /etc/rsyslog.conf and by *.conf files in /etc/rsyslog.d. Programs and administrators can change rsyslogd configuration in a way that will not be overwritten by updates to rsyslog by putting customized files with a .conf suffix in the /etc/rsyslog.d directory.
+
+The RULES section of the /etc/rsyslog.conf contains directives that define where log messages are saved. * stands for all facilites or all severities.
+
+log files are maintained by the rsyslog service and /var/log directory contains a variety of log files specific to certain services. 
+
+A message handled by rsyslog can appear in multiple different log files. To prevent that, the severity field can be set to none, which means that none of the messages directed to this facility are added to the specified log file. 
+
+Logs are rotated by the logrotate utility to keep them from filling up the file system containing /var/log. When a log file is rotated, it is renamed with an extension indicating the date on which it was rotated. Once the old log file is rotated, a new log file is created and the service that writes to it is notified.
+
+After a certain number of rotations, typically after 4 weeks, the old log file is discarded to free disk space. A cron job runs the logrotate program daily to see if any logs need to be rotated. Most log files are rotated weekly, but logrotate rotates some faster, or slower, or when they reach a certain size.
+
+Log file format:
+1. The timestamp when the log entry was recorded.
+2. The host from which the log message was sent.
+3. The program or process that sent the log message.
+4. The actual message sent.
+
+=> logger -p local7.notice "Log entry created on serverx"
+The logger command can send messages to the rsyslog service
+
+The systemd journal stores logging data in a structured, indexed binary file. This data included extra information about the log event. 
+The systemd journal is stored in /run/log by default, and its contents are cleared after a reboot. This setting can be changed by the system administrator.
+
+=> journalctl
+The journalctl command shows the full system journal, starting with the oldest log entry when run as root user.
+=> journalctl -n 10 -> shows the last 10 log entries.
+=> journalctl -p err -> takes either the name or the number of the known priority levels and shows the given levels and all higher level entries.
+=> journalctl -f -> outputs the last 10 lines of the journal and continues to output new journal entries.
+=> journalctl --since today -> output all journal entries that got recorded today 
+=> journalctl --since "2014-02-10 20:30:00" --until "2014-02-13 12:00:00" -> output all journal entries between given time frame
+=> journalctl -o verbose 
+=> journalctl _SYSTEMD_UNIT=sshd.service _PID=1182 
+	-> _COMM -> name of command
+	-> _EXE -> path to the executable for the process
+	-> _UID -> UID of the user running the process
+	-> _SYSTEMD_UNIT -> the systemd unit that started the process
+
+By default the systemd-journal is kept in /run/log/journal, which means it is cleared when the system reboots. If the directory /var/log/journal exists, the journal will log to that directory instead. The advantage of this is that the historic data will be available immediately at boot. The journal has a built in log rotation mechanism that will trigger monthly. In addition the journal will not be allowed to get larger than 10% of the file system it is on, or leave less than 15% of the file system free. These values can be tuned inside /etc/systemd/journald.conf, and the current limits on the size of the journal are logged when the systemd-journal process starts. 
+
+=> chown root:systemd-journal /var/log/journal
+=> chmod 2755 /var/log/journal 
+=> killall -USR1 systemd-journald
+=> journalctl -b -> shows log messages since the last boot of the system
+=> journalctl -b -1 -> limits the output to the previous boot
+
+The Network Time Protocol(NTP) is a standard way for machines to provide and obtain correct time information on the Internet. A machine may get accurate time information from public NTP services on the internet such as the NTP Pool Project. 
+
+=> timedatectl -> shows an overview of the current time-related system settings, including current time, time zone and NTP synchronization settings of the system. 
+
+=> timedatectl list-timezones -> database with known time zones can be listed
+Time zone names are based on the public tz timezone database maintained by IANA. Time zones are named based on continents or oceans, then typically but not always the largest city within the time zone region. 
+=> tzselect -> useful for identifying correct zoneinfo time zone names. It interactively prompts the user with questions about the system's location, and outputs the name of the correct time zone. It does not make any changes to the time zone setting of the system.
+
+=> timedatectl set-timezone America/Phoenix -> set timezone to America/Phoenix
+=> timedatectl set-time 09:00:00 -> set time to 9:00 am
+=> timedatectl set-ntp true -> enables ntp synchronization for automatic time adjustment
+
+The chronyd service keeps the usually-inaccurate local hardware clock(RTC) on track by synchronizing it to the configured NTP servers, or if no network connectivity is available, to the calculated RTC clock drift which is recorded in the driftfile specified in the /etc/chrony.conf configuration file.
+
+By default, chronyd uses servers from the NTP Pool Project for the time synchronization and does not need additional configuration. It may be useful to change the NTP servers when the machine in question is on an isolated network.
+
+The quality of an NTP time source is determined by the stratum value reported by the time source. The stratum determines the number of hops the machine is away from a high-performance reference clock. The reference clock is a stratum 0 time source. An NTP server directly attached to it is a stratum 1, while a machine synchronizing time from the NTP server is a stratum 2 time source.
+
+There are 2 categories of time sources that can be configured in the /etc/chrony.conf configuration file, server and peer. The server is 1 stratum above the local NTP server, and the peer is at the same stratum level. More than 1 server and more than 1 peer can be specified, 1 per line.
+
+Use the iburst option to finetune. 
+=> systemctl restart chronyd -> Restart chronyd service after making configuration changes.  
+
+The chronyc command acts as a client to the chronyd service. 
+=> chronyc sources -v -> verify NTP server was used to synchronize the clock 
+
+Steps to set up correct time zone and adjust system clocks:
+	-> identify appropriate time zone -> timedatectl list-timezones
+	-> verify the clock was synchronized against the newly specified NTP source with the command -> chronyc sources
+	-> point chronyd to a new time source by adjusting /etc/chrony.conf
+	-> turn on NTP synchronization 
+	-> review current settings with timedatectl 
+	-> set the correct time zone -> timedatectl set-timezone
+	-> restart chronyd service -> systemctl restart chronyd
+
+When a packet is sent across a network, the combination of the service port and IP address forms a socket. 
+
+An IPv4 address is a 32 bit number, normally expressed in decimal as 4 octets ranging in value from 0 to 255, separated by .
+The address is divided into 2 parts, the network part and the host part. All hosts on the same subnet, which can talk directly to each other directly without a router, have the same network part , the network part identifies the subnet. No 2 hosts on the same subnet can have the same host part.
+
+To know which part of an IPv4 address is the network part and which is the host part, an administrator must know the netmask which is assigned to the subnet. The more bits that are available for the host part, the more hosts can be on the subnet.
+
+The lowest possible address on the subnet is sometimes called the network address. The highest possible address on a subnet is used for broadcast messages in IPv4, and is called the broadcast address.
+
+Network address for 172.16.181.23/19
+Host address -> 10101100.10101000.10110101.00010111
+Network address -> 10101100.10101000.10100000.00000000
+Broadcast address -> 10101100.10101000.10111111.11111111
+
+127.0.0.1 -> points to the local system(localhost) and the network 127.0.0.0/8 belongs to the local system, so that it can talk to itself using network protocols.
+
+Each host has a routing table, which tells it how to route traffic for particular networks. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
