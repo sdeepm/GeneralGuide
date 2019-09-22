@@ -769,6 +769,121 @@ Broadcast address -> 10101100.10101000.10111111.11111111
 127.0.0.1 -> points to the local system(localhost) and the network 127.0.0.0/8 belongs to the local system, so that it can talk to itself using network protocols.
 
 Each host has a routing table, which tells it how to route traffic for particular networks. 
+The routing table entries will list a destination network, which interface to send the traffic out, and the IP address of any intermediate router that is required to relay the message to its final destination. The routing table entry which matches the destination of the network traffic is used to route it. If 2 entries match, the 1 with the longest prefix is used. 
+
+If the network traffic does not match a more specific route, the routing table usually has an entry for a default route to the entire IPv4 internet 0.0.0.0/0. This default route points to a router on a reachable subnet( that is on a subnet that has a more specific route in the host's routing table)
+
+If a router receives traffic that is not addressed to it, instead of ignoring it like a normal host, it forwards the traffic based on its own routing table. This may send the traffic directly to the destination host(if the router happens to be on the destination's subnet), or it may be forwarded on to another router. 
+
+In order for name service to work, the host needs to be pointed at a nameserver. This nameserver does not need to be on the same subnet. It just needs to be reachable by the host.
+
+DHCP -> Dynamic Host Configuration Protocol
+
+Network interfaces in linux are enumerated as eth0, eth1, eth2 and so on. However the mechanism which sets these names can cause changes to which interface gets which name as devices are added or removed. Ethernet interfaces begin with en, WLAN interfaces being with wl, and WWAN interfaces begin with ww. The next character represents the type of adapter with an o for on-board, s for hotplug slot, and p for PCI geographic location. x is used to incorporate a MAC address. Finally a number N is used to represent an index, ID or port. 
+
+Network interface naming can be overridden. If the administrator has installed biosdevname package or set customized udev device naming rules, those settings will override the default naming scheme. 
+
+=> /sbin/ip command -> used to show device and address information
+
+=> ip addr show eth0
+	-> An active interface has the status of 1
+	-> The link line specifies the mac address of the device
+	-> the inet line shows the IPv4 address and prefix
+	-> the broadcast address, scope and device name
+	-> The inet6 line shows the IPv6 information
+
+The ip command can also be used to show statistics about network performance. The received and transmitted packets, error, dropped counters can be used to identify network issues caused by congestion, low memory, and overruns.
+
+=> ip -s link show eth0
+=> ip route
+
+=> ping -c3 172.25.X.254 -> used to test connectivity.
+=> traceroute/tracepath -> to trace the path to a remote host. -> UDP(default), ICMP(-I), TCP(-T) packets.
+
+Each line in the output of tracepath represents a router or hop that the packet passes through between the source and the final destination. RTT(Round Trip Timing) and MTU(Maximum Transmission Unit).
+
+TCP services use sockets as end points for communication and are made up of an IP address, protocol and port number. Services typically listen on standard ports while clients use a random available port. Well known names for standard ports are listed in /etc/services file.
+
+=> ss -ta command -> display socket statistics -> similar to netstat command which is not installed by default
+	-> -n -> show numbers instead of names for interfaces and ports
+	-> -t -> show tcp sockets
+	-> -u -> show UDP packets
+	-> -l -> show only listening sockets
+	-> -a -> show all (listening and established sockets)
+	-> -p -> show the process using the sockets
+  -> * is used to respresent all when referencing IPv4 addresses or ports
+  -> the :: syntax is used to represent all IPv6 interfaces
+  -> ::1 IPv6 loopback interface
+
+=> ip addr -> display the current IP address and netmask for all interfaces
+=> ip -s link show eth0 -> display the statistics for the eth0 interface
+=> ip route -> display the route information
+=> ss -lt -> disply the listening TCP sockets on the local system
+
+NetworkManager is a daemon that monitors and manages network settings. Configuration files lie in /etc/sysconfig/network-scripts directory.
+A device is a network interface. A connection is a configuration used for a device which is made up of a collection of settings. Multiple connections may exist for a device, but only 1 may be active at a time. 
+
+=> nmcli con show command -> to display a list of all connections . --active option to list only active connections
+=> nmcli con show "static-eth0" -> see details of that connection
+=> nmcli dev status -> show device status and details.
+=> nmcli dev show eth0
+
+When creating a new connection with nmcli, the order of the arguements is important. The common arguements appear first and must include the type and interface. Next specify any type-specific arguements and finally specify the IP address prefix and gateway information. Multiple IP addresses may be specified for a single device. Additional settings such as a DNS server are set as modifications once the connection exists.
+
+=> nmcli con add con-name "default" type ethernet ifname eth0 -> define a new connection named default which will autoconnect as an Ethernet connection on the eth0 device using DHCP.
+=> nmcli con add con-name "static" ifname eth0 autoconnect no type ethernet ip4 172.25.X.10/24 gw4 172.25.X.254 -> create a new connection named static and specify the IP address and gateway. Do not autoconnect.
+=> nmcli con up "static" -> the system will autoconnect with the DHCP connection at boot. Change to the static connection.
+=> nmcli con up "default" -> change back to the DHCP connection
+=> nmcli dev disconnect DEVICENAME -> to administratively disable an interface and prevent any autoconnection
+=> nmcli con add help
+
+An existing connection can be modified with nmcli con mod arguements. The arguements are sets of key/value pairs. They key includes a setting name and a property name. 
+=> nmcli con show "static" -> to see list of values for a connection.
+=> nmcli con mod "static" connection.autoconnect no 
+=> nmcli con mod "static" ipv4.dns 172.25.X.254 -> specify a dns server
+=> nmcli con mod "static" +ipv4.dns 8.8.8.8 -> add a secondary dns server
+=> nmcli con mod "static" ipv4.addresses "172.25.X.10/24 172.25.X.254" -> replace the static ip address and gateway
+=> nmcli con mod "static" +ipv4.addresses 10.10.10.10/16 -> add a secondary ip address without a gateway
+
+to activate the changes, the connection needs to be activated or reactivated
+=> nmcli con up "static"
+
+=> nmcli dev status -> list all devices
+=> nmcli con show -> list all connections
+=> nmcli con up "<ID>" -> activate a connection
+=> nmcli con down "<ID>" -> deactivate a connection, the connection will restart if autoconnect is yes
+=> nmcli dev dis <DEV> -> bring down an interface and temporarily disable autoconnect
+=> nmcli net off -> disable all managed interfaces
+=> nmcli con add ... -> add a new connection
+=> nmcli con mod "<ID>" -> modify a connection
+=> nmcli con del "<ID>" -> delete a connection
+
+nm-connection-editor -> nmcli interactive edit mode
+
+It is also possible to configure the network by editing interface configuration files. Interface configuration files control the software interfaces for individual network devices. These files are usually named /etc/sysconfig/network-scripts/ifcfg-<name> where <name> is the name of the device or connection that the configuration file controls. After modifying configuration files , run command => nmcli con reload to make NetworkManager read the configuration changes. The interface still needs to be restarted for changes to take effect.
+
+=> hostname command -> displays or temporarily modifies the system's fully qualified host name. A static host may be specified in the /etc/hostname file. 
+=> hostnamectl command -> used to modify this file and may be used to view the status of the system's fully qualified host name. If this file doesn't exist, the hostname is set by a reverse DNS query once the interface has an IP address assigned.
+
+=> hostnamectl set-hostname desktopX.example.com
+=> hostnamectl status
+
+Name Resolution -> The stub resolver is used to convert host names to IP addresses or the reverse. The contents of the file /etc/hosts are checked first. 
+=> getent hosts hostname -> test hostname resolution
+If an entry is not found in that file the stub resolver looks for the information from a DNS nameserver. The /etc/resolv.conf file controls how this query is done.
+
+nameserver -> ip address of the nameserver to query 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
