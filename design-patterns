@@ -1,0 +1,18 @@
+Design patterns can be categorized in the following categories:
+• Creational patterns
+• Structural patterns
+• Behavior patterns
+
+There are too many instances of a class which represent only a single thing, the value in the properties of the objects
+are same, and they are only used as read-only: you can select the Singleton pattern for this design problem which ensures
+only a single instance for the entire application. It also helps to decrease the memory size.
+
+Classes are too much dependent on each other. A Change in one class affects all other dependent classes: you can use
+Bridge, Mediator, or Command to solve this design problem.
+
+There are two different incompatible interfaces in two different parts of the code, and your need is to convert one
+interface into another which is used by the client code to make the entire code work: the Adapter pattern fits into this
+problem.
+A design pattern can be used to solve more than 1 design problem, and one design problem can be solved by more than 1
+design patterns.
+
