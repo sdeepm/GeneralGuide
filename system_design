@@ -1,0 +1,9 @@
+Design Distributed Database : 
+
+highly consistency over highly availability 
+highly available over highly consistent -> cassandra
+
+Characteristics of database : 
+	Durability
+	Availability
+	performance

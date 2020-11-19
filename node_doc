@@ -1,0 +1,57 @@
+Node applications are non-blocking and asynchronous by default.Node.js uses an event-driven, non-blocking I/O model that makes it lightweight and efficient, perfect for data-intensive real-time applications that run across distributed devices.
+A single thread handles all the requests.
+Node.js is a server-side platform built on Google Chrome's JavaScript Engine (V8 Engine).
+Node constantly monitors an event queue and pulls out of that queue to process results returned from database etc.
+Node is ideal for I/O intensive apps like video streaming sites, single-page applications, and other web applications.
+Node applications are highly scalable.
+
+Node.js = Runtime Environment + JavaScript Library
+
+Node.js is an open source, cross-platform runtime environment for developing server-side and networking applications. Node.js applications are written in JavaScript, and can be run within the Node.js runtime on OS X, Microsoft Windows, and Linux.
+
+Node.js uses a single threaded model with event looping. Event mechanism helps the server to respond in a non-blocking way and makes the server highly scalable as opposed to traditional servers which create limited threads to handle requests. Node.js uses a single threaded program and the same program can provide service to a much larger number of requests than traditional servers like Apache HTTP Server.
+
+A Node.js application runs on single thread and the event loop also runs on the same thread. Hence, we can say Node.js is single-threaded but the catch is that there are some libraries in Node.js that are not single-threaded.
+
+Node.js internally uses the libuv library which is responsible for handling operating system related tasks, like asynchronous I/O based operation systems, networking, concurrency, etc.
+
+Node.js is single-threaded but in the background it uses multiple threads to execute asynchronous code with the help of the libuv library.
+
+Libuv sets up a thread pool of four threads to perform OS-related operations by utilizing the power of all the CPU cores.
+
+Node is written in C++.
+
+Node should not be used for CPU intensive applications like video encoding or image manipulation. The applications are CPU 
+intensive and few file system calls and network calls. If we do this then one thread will have to wait to serve other requests.
+
+console object is part of global scope
+setTimeout is also a global object used to call a function after a delay
+clearTimeout, setInterval, clearInterval etc.
+
+We use the require directive to load Node.js module
+
+Node comes bundled with a REPL environment. It performs the following tasks −
+read, eval, print, loop
+
+Creating a module requires package.json to be generated. -> npm init
+
+Non-blocking programs do not execute in sequence. In case a program needs to use any data to be processed, it should be kept within the same block to make it sequential execution.
+
+Node.js is a single-threaded application, but it can support concurrency via the concept of event and callbacks. Every API of Node.js is asynchronous and being single-threaded, they use async function calls to maintain concurrency. Node uses observer pattern. Node thread keeps an event loop and whenever a task gets completed, it fires the corresponding event which signals the event-listener function to execute.
+
+In an event-driven application, there is generally a main loop that listens for events, and then triggers a callback function when one of those events is detected.
+
+In Node Application, any async function accepts a callback as the last parameter and a callback function accepts an error as the first parameter.
+
+Streams are objects that let you read data from a source or write data to a destination in continuous fashion. In Node.js, there are four types of streams −
+Readable − Stream which is used for read operation.
+Writable − Stream which is used for write operation.
+Duplex − Stream which can be used for both read and write operation.
+Transform − A type of duplex stream where the output is computed based on input.
+
+Each type of Stream is an EventEmitter instance and throws several events at different instance of times. For example, some of the commonly used events are −
+data − This event is fired when there is data is available to read.
+end − This event is fired when there is no more data to read.
+error − This event is fired when there is any error receiving or writing data.
+finish − This event is fired when all the data has been flushed to underlying system.
+

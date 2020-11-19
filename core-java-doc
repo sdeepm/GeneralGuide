@@ -1,0 +1,69 @@
+Race Condition
+
+A race condition is a special condition that may occur inside a critical section. A critical section is a section of code that is executed by multiple threads and where the sequence of execution for the threads makes a difference in the result of the concurrent execution of the critical section.
+
+Here is a critical section Java code example that may fail if executed by multiple threads simultaneously:
+
+  public class Counter {
+
+     protected long count = 0;
+
+     public void add(long value){
+         this.count = this.count + value;
+     }
+  }
+
+   A:  Reads this.count into a register (0)
+   B:  Reads this.count into a register (0)
+   B:  Adds value 2 to register
+   B:  Writes register value (2) back to memory. this.count now equals 2
+   A:  Adds value 3 to register
+   A:  Writes register value (3) back to memory. this.count now equals 3  
+
+Imagine if two threads, A and B, are executing the add method on the same instance of the Counter class. There is no way to know when the operating system switches between the two threads. The code in the add() method is not executed as a single atomic instruction by the Java virtual machine. Rather it is executed as a set of smaller instructions, similar to this:
+
+1. Read this.count from memory into register.
+2. Add value to register.
+3. Write register to memory.
+
+To prevent race conditions from occurring you must make sure that the critical section is executed as an atomic instruction. That means that once a single thread is executing it, no other threads can execute it until the first thread has left the critical section.
+
+For smaller critical sections making the whole critical section a synchronized block may work. But, for larger critical sections it may be beneficial to break the critical section into smaller critical sections, to allow multiple threads to execute each a smaller critical section. This may decrease contention on the shared resource, and thus increase throughput of the total critical section.
+
+public class TwoSums {
+    
+    private int sum1 = 0;
+    private int sum2 = 0;
+
+    private Integer sum1Lock = new Integer(1);
+    private Integer sum2Lock = new Integer(2);
+
+    public void add(int val1, int val2){
+        synchronized(this.sum1Lock){
+            this.sum1 += val1;   
+        }
+        synchronized(this.sum2Lock){
+            this.sum2 += val2;
+        }
+    }
+}
+
+-----------------------------------------------------------
+
+GET: Retrieves data from the server. Should have no other effect.
+POST: Sends data to the server for creating a new entity. Often used when uploading a file or submitting a web form.
+PUT: Similiar to POST, but used to replace an existing entity.
+PATCH: Similar to PUT, but used to update only certain fields within an existing entity.
+DELETE: Removes data from the server.
+TRACE: Provides a way to test what server receives. It simply returns what was sent.
+OPTIONS: Allows a client to get information about the request methods supported by a service. The relevant response header is Allow with supported methods. Also used in CORS as preflight request to inform server about actual request method and ask about custom headers.
+HEAD: Returns only the response headers.
+CONNECT: Used by browser when it knows it talks to a proxy and the final URI begins with https://. The intent of CONNECT is to allow end-to-end encrypted TLS session, so the data is unreadable to a proxy.
+
+-----------------------------------------------------------
+
+Stateless object is an instance of a class without instance fields (instance variables). The class may have fields, but they are compile-time constants (static final).
+
+A very much related term is immutable. Immutable objects may have state, but it does not change when a method is invoked (method invocations do not assign new values to fields). These objects are also thread-safe.
+
+------------------------------------------------------------

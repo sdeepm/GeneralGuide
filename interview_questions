@@ -1,0 +1,405 @@
+A process is a program under execution, i.e. a running program and is created when a program starts execution. A process can have multiple threads.
+
+A thread is the smallest sequence of programmed instructions that can be managed independently by a scheduler, which is typically a part of the operating system.
+
+The primary difference is that threads within the same process run on a shared memory space, while processes run in separate memory spaces.
+
+Multi-processing
+Multiprocessing is the use of two or more CPUs (processors) within a single computer system. Now, as there are multiple processors available, multiple processes can be executed at a time.
+
+Multi-threading
+Multi-threading is an execution model that allows a single process to have multiple code blocks (threads) running concurrently within the “context” of that process.
+
+A thread pool is a group of pre-instantiated, idle threads which stand ready to be given work. By maintaining a pool of threads, the model increases performance and avoids latency in execution, due to frequent creation and destruction of threads for short-lived tasks.
+------------------------------
+
+A framework is a collection of libraries, but the idea is different. (a library is just another module or function which is exposed to be used outside).It’s solving structural and architectural problems on the code level.
+
+The key difference between a library and a framework is "Inversion of Control". When you call a method from a library, you are in control. But with a framework, the control is inverted: the framework calls you.
+
+In framework, all the control flow is already there, and there's a bunch of predefined white spots that you should fill out with your code. A framework is normally more complex. It defines a skeleton where the application defines its own features to fill out the skeleton.
+
+We can think of a library as a certain function of an application, a framework as the skeleton of the application.
+
+------------------------------
+
+Inversion of Control (IoC) means that objects do not create other objects on which they rely to do their work. Instead, they get the objects that they need from an outside source (for example, an xml configuration file).
+
+Dependency Injection (DI) means that this is done without the object intervention, usually by a framework component that passes constructor parameters and set properties.
+
+------------------------------
+
+Collections are in-memory data structures which hold elements within it. Each element in the collection is computed before it actually becomes a part of that collection. On the other hand Streams are fixed data structures which computes the elements on-demand basis.
+
+The Java 8 Streams can be seen as lazily constructed Collections, where the values are computed when user demands for it. Actual Collections behave absolutely opposite to it and they are set of eagerly computed values (no matter if the user demands for a particular value or not).
+
+Stream is an interface.
+
+Streams can be defiled as a sequence of elements from a source that supports aggregate operations. The common aggregate operations are filter, map, reduce, find, match, sort. These operations can be executed in series or in parallel.The Streams also support Pipelining and Internal Iterations.The Java 8 Streams are designed in such a way that most of its stream operations returns Streams only. This help us creating chain of various stream operations. This is called as pipelining.
+
+Java 8 Stream operations has methods like foreach, map, filter, etc. which internally iterates through the elements. The code is completely unaware of the iteration logic in the background.The intermediate operations return streams and hence can be connected together to form a pipeline of operations.  Terminal operations collect the results of various stream operations in the form of anything like lists, integers or simply nothing.The most interesting part to know about the intermediate operations is that they are lazy.The intermediate operations will not be invoked until the terminal operation is invoked.This is very important when we are processing larger data streams. The process only on demand principle drastically improves the performance. The laziness of the intermediate operations help to invoke these operation in one pass.
+
+A stream does not store data and, in that sense, is not a data structure. It also never modifies the underlying data source.
+
+------------------------------
+
+Java Stack memory is used for the execution of a thread. They contain method-specific values that are short-lived and references to other objects in the heap that is getting referred from the method.
+Stack memory is always referenced in LIFO (Last-In-First-Out) order. Whenever a method is invoked, a new block is created in the stack memory for the method to hold local primitive values and reference to other objects in the method.
+Stack memory size is very less compared to Heap memory.
+
+Stack memory:
+
+It grows and shrinks as new methods are called and returned respectively
+Variables inside stack exist only as long as the method that created them is running
+It’s automatically allocated and deallocated when method finishes execution
+If this memory is full, Java throws java.lang.StackOverFlowError
+Access to this memory is fast when compared to heap memory
+This memory is thread-safe as each thread operates in its own stack
+
+Heap memory is allocated during the execution of instructions written by programmers. Note that the name heap has nothing to do with heap data structure. It is called heap because it is a pile of memory space available to programmers to allocated and de-allocate. If a programmer does not handle this memory well, a memory leak can happen in the program.
+
+Heap memory:
+
+It’s accessed via complex memory management techniques that include Young Generation, Old or Tenured Generation, and Permanent Generation
+If heap space is full, Java throws java.lang.OutOfMemoryError
+Access to this memory is relatively slower than stack memory
+This memory, in contrast to stack, isn’t automatically deallocated. It needs Garbage Collector to free up unused objects so as to keep the efficiency of the memory usage
+Unlike stack, a heap isn’t thread-safe and needs to be guarded by properly synchronizing the code
+
+Differences between Heap and Stack memory.
+
+Heap memory is used by all the parts of the application whereas stack memory is used only by one thread of execution.
+Whenever an object is created, it’s always stored in the Heap space and stack memory contains the reference to it. Stack memory only contains local primitive variables and reference variables to objects in heap space.
+Objects stored in the heap are globally accessible whereas stack memory can’t be accessed by other threads.
+Memory management in the stack is done in a LIFO manner whereas it’s more complex in Heap memory because it’s used globally. Heap memory is divided into Young-Generation, Old-Generation etc, more details at Java Garbage Collection.
+Stack memory is short-lived whereas heap memory lives from the start till the end of application execution.
+We can use -XMX and -XMS JVM option to define the startup size and maximum size of heap memory. We can use -XSS to define the stack memory size.
+When stack memory is full, Java runtime throws java.lang.StackOverFlowError whereas if heap memory is full, it throws java.lang.OutOfMemoryError: Java Heap Space error.
+Stack memory size is very less when compared to Heap memory. Because of simplicity in memory allocation (LIFO), stack memory is very fast when compared to heap memory.
+
+------------------------------
+
+Java garbage collection is an automatic process. The programmer does not need to explicitly mark objects to be deleted. The garbage collection implementation lives in the JVM. Each JVM can implement garbage collection however it pleases; the only requirement is that it meets the JVM specification. Although there are many JVMs, Oracle’s HotSpot is by far the most common. It offers a robust and mature set of garbage collection options.
+
+While HotSpot has multiple garbage collectors that are optimized for various use cases, all its garbage collectors follow the same basic process. In the first step, unreferenced objects are identified and marked as ready for garbage collection. In the second step, marked objects are deleted. Optionally, memory can be compacted after the garbage collector deletes objects, so remaining objects are in a contiguous block at the start of the heap. The compaction process makes it easier to allocate memory to new objects sequentially after the block of memory allocated to existing objects.
+
+All of HotSpot’s garbage collectors implement a generational garbage collection strategy that categorizes objects by age. The rationale behind generational garbage collection is that most objects are short-lived and will be ready for garbage collection soon after creation.
+
+The heap is divided into three sections:
+
+Young Generation: Newly created objects start in the Young Generation. The Young Generation is further subdivided into an Eden space, where all new objects start, and two Survivor spaces, where objects are moved from Eden after surviving one garbage collection cycle. When objects are garbage collected from the Young Generation, it is a minor garbage collection event.
+Old Generation: Objects that are long-lived are eventually moved from the Young Generation to the Old Generation. When objects are garbage collected from the Old Generation, it is a major garbage collection event.
+Permanent Generation: Metadata such as classes and methods are stored in the Permanent Generation. Classes that are no longer in use may be garbage collected from the Permanent Generation.
+
+During a full garbage collection event, unused objects in all generations are garbage collected.
+
+Oracle HotSpot has four garbage collectors:
+
+Serial: All garbage collection events are conducted serially in one thread. Compaction is executed after each garbage collection.
+Parallel: Multiple threads are used for minor garbage collection. A single thread is used for major garbage collection and Old Generation compaction. Alternatively, the Parallel Old variant uses multiple threads for major garbage collection and Old Generation compaction.
+CMS (Concurrent Mark Sweep): Multiple threads are used for minor garbage collection using the same algorithm as Parallel. Major garbage collection is multi-threaded, like Parallel Old, but CMS runs concurrently alongside application processes to minimize “stop the world” events (i.e. when the garbage collector running stops the application). No compaction is performed.
+G1 (Garbage First): The newest garbage collector is intended as a replacement for CMS. It is parallel and concurrent like CMS, but it works quite differently under the hood compared to the older garbage collectors.
+
+------------------------------
+
+Stateless object is an instance of a class without instance fields (instance variables). The class may have fields, but they are compile-time constants (static final).
+
+A very much related term is immutable. Immutable objects may have state, but it does not change when a method is invoked (method invocations do not assign new values to fields). These objects are also thread-safe.
+
+If the object doesn't have any instance fields, it it stateless. Also it can be stateless if it has some fields, but their values are known and don't change.
+
+This is also a stateless object:
+
+class Stateless {
+    //No static modifier because we're talking about the object itself
+    final String TEST = "Test!";
+
+    void test() {
+        System.out.println(TEST);
+    }
+}
+
+This object has state, so it is not stateless. However, it has its state set only once, and it doesn't change later, this type of objects is called immutable:
+
+class Immutable {
+    final String testString;
+
+    Immutable(String testString) {
+        this.testString = testString;
+    }
+
+    void test() {
+        System.out.println(testString);
+    }
+}
+
+------------------------------
+
+Mark and Sweep Algorithm
+Any garbage collection algorithm must perform 2 basic operations. One, it should be able to detect all the unreachable objects and secondly, it must reclaim the heap space used by the garbage objects and make the space available again to the program.
+The above operations are performed by Mark and Sweep Algorithm in two phases:
+1) Mark phase
+2) Sweep phase
+
+Mark Phase
+When an object is created, its mark bit is set to 0(false). In the Mark phase, we set the marked bit for all the reachable objects (or the objects which a user can refer to) to 1(true). Now to perform this operation we simply need to do a graph traversal, a depth first search approach would work for us. Here we can consider every object as a node and then all the nodes (objects) that are reachable from this node (object) are visited and it goes on till we have visited all the reachable nodes.
+
+Root is a variable that refer to an object and is directly accessible by local variable. We will assume that we have one root only.
+We can access the mark bit for an object by: markedBit(obj).
+Algorithm -Mark phase:
+
+Mark(root)
+    If markedBit(root) = false then
+        markedBit(root) = true
+        For each v referenced by root
+             Mark(v)
+Note: If we have more than one root, then we simply have to call Mark() for all the root variables.
+
+Sweep Phase
+As the name suggests it “sweeps” the unreachable objects i.e. it clears the heap memory for all the unreachable objects. All those objects whose marked value is set to false are cleared from the heap memory, for all other objects (reachable objects) the marked bit is set to true.
+Now the mark value for all the reachable objects is set to false, since we will run the algorithm (if required) and again we will go through the mark phase to mark all the reachable objects.
+
+Algorithm – Sweep Phase
+
+Sweep()
+For each object p in heap
+    If markedBit(p) = true then
+        markedBit(p) = false
+    else
+        heap.release(p)
+The mark-and-sweep algorithm is called a tracing garbage collector because it traces out the entire collection of objects that are directly or indirectly accessible by the program.
+
+Advantages of Mark and Sweep Algorithm :
+
+It handles the case with cyclic references, even in case of a cycle, this algorithm never ends up in an infinite loop.
+There are no additional overheads incurred during the execution of the algorithm.
+
+Disadvantages of Mark and Sweep Algorithm :
+
+The main disadvantage of the mark-and-sweep approach is the fact that that normal program execution is suspended while the garbage collection algorithm runs.
+Other disadvantage is that, after the Mark and Sweep Algorithm is run several times on a program, reachable objects end up being separated by many, small unused memory regions.
+
+------------------------------
+
+Pass By value and pass by reference
+
+public class Test {
+
+    public static void main(String[] args) {
+
+        Balloon red = new Balloon("Red"); //memory reference 50
+        Balloon blue = new Balloon("Blue"); //memory reference 100
+        
+        swap(red, blue);
+        System.out.println("red color="+red.getColor());
+        System.out.println("blue color="+blue.getColor());
+        
+        foo(blue);
+        System.out.println("blue color="+blue.getColor());
+        
+    }
+
+    private static void foo(Balloon balloon) { //baloon=100
+        balloon.setColor("Red"); //baloon=100
+        balloon = new Balloon("Green"); //baloon=200
+        balloon.setColor("Blue"); //baloon = 200
+    }
+
+    //Generic swap method
+    public static void swap(Object o1, Object o2){
+        Object temp = o1;
+        o1=o2;
+        o2=temp;
+    }
+}
+When we execute above program, we get following output.
+
+red color=Red
+blue color=Blue
+blue color=Red
+If you look at the first two lines of the output, it’s clear that swap method didn’t worked. This is because Java is pass by value, this swap() method test can be used with any programming language to check whether it’s pass by value or pass by reference.
+
+When we use new operator to create an instance of a class, the instance is created and the variable contains the reference location of the memory where the object is saved. For our example, let’s assume that “red” is pointing to 50 and “blue” is pointing to 100 and these are the memory location of both Balloon objects.
+
+Now when we are calling swap() method, two new variables o1 and o2 are created pointing to 50 and 100 respectively.
+
+So below code snippet explains what happened in the swap() method execution.
+
+public static void swap(Object o1, Object o2){ //o1=50, o2=100
+    Object temp = o1; //temp=50, o1=50, o2=100
+    o1=o2; //temp=50, o1=100, o2=100
+    o2=temp; //temp=50, o1=100, o2=50
+} //method terminated
+Notice that we are changing values of o1 and o2 but they are copies of “red” and “blue” reference locations, so actually there is no change in the values of “red” and “blue” and hence the output.
+
+Please note : VVI : But you can modify the values at the address to which the red and blue is pointing to using the copies o1 and o2, but you cant modify red and blue itself just by modifying o1 and o2 , meaning that o1 pointing to another address will not make red point to another address
+
+//check code in CycleDetection class in Competitive Programming
+
+------------------------------
+
+NoSQL databases come in a variety of types based on their data model. The main types are document, key-value, wide-column, and graph
+Many find modeling relationship data in NoSQL databases to be easier than in SQL databases, because related data doesn’t have to be split between tables
+NoSQL data models allow related data to be nested within a single data structure.
+Gone were the days of needing to create a complex, difficult-to-manage data model simply for the purposes of reducing data duplication. Developers (rather than storage) were becoming the primary cost of software development, so NoSQL databases optimized for developer productivity.
+
+NoSQL databases often leverage data models more tailored to specific use cases, making them better at supporting those workloads than relational databases. For example, key-value databases support simple queries very efficiently while graph databases are the best for queries that involve identifying complex relationships between separate pieces of data.
+NoSQL databases are designed from the ground up to scale-out horizontally, making it much easier to maintain performance as your workload grows beyond the limits of a single server.
+
+Performance -> 
+NoSQL databases can often perform better than SQL/relational databases for your use case
+
+Scalability ->
+SQL/relational databases were originally designed to scale up
+
+Data Distribution -> 
+suppose the business needs a globally distributed application that provides excellent performance to users all around the world. NoSQL databases can allow you to deploy a single distributed cluster to support that application and ensure low latency access to data from anywhere. This approach also makes it much easier to comply with data sovereignty mandates required by modern privacy regulations.
+
+ SQL databases rose in popularity in the early 1970s. At the time, storage was extremely expensive, so software engineers normalized their databases in order to reduce data duplication.Software engineers in the 1970s also commonly followed the waterfall software development model. Projects were planned in detail before development began. Software engineers painstakingly created complex entity-relationship (E-R) diagrams to ensure they had carefully thought through all the data they would need to store. Due to this upfront planning model, software engineers struggled to adapt if requirements changed during the development cycle. As a result, projects frequently went over budget, exceeded deadlines and failed to deliver against user needs.
+
+Reliability ->
+NoSQL databases ensure high availability and uptime with native replication and built-in failover for self-healing, resilient database clusters. Similar failover systems can be set up for SQL databases but since the functionality is not native to the underlying database, this often means more resources to deploy and maintain a separate clustering layer that then takes longer to identify and recover from underlying systems failures. 
+
+Flexibility
+NoSQL databases are better at allowing users to test new ideas and update data structures.
+
+=> Document databases store data in documents similar to JSON (JavaScript Object Notation) objects. Each document contains pairs of fields and values. The values can typically be a variety of types including things like strings, numbers, booleans, arrays, or objects, and their structures typically align with objects developers are working with in code. Because of their variety of field value types and powerful query languages, document databases are great for a wide variety of use cases and can be used as a general purpose database.
+
+=> Key-value databases are a simpler type of database where each item contains keys and values. A value can typically only be retrieved by referencing its key, so learning how to query for a specific key-value pair is typically simple. Key-value databases are great for use cases where you need to store large amounts of data but you don’t need to perform complex queries to retrieve it. Common use cases include storing user preferences or caching. Redis and DynanoDB are popular key-value databases.
+
+=> Wide-column stores store data in tables, rows, and dynamic columns. Wide-column stores provide a lot of flexibility over relational databases because each row is not required to have the same columns. Many consider wide-column stores to be two-dimensional key-value databases. Wide-column stores are great for when you need to store large amounts of data and you can predict what your query patterns will be. Wide-column stores are commonly used for storing Internet of Things data and user profile data. Cassandra and HBase are two of the most popular wide-column stores.
+
+=> Graph databases store data in nodes and edges. Nodes typically store information about people, places, and things while edges store information about the relationships between the nodes. Graph databases excel in use cases where you need to traverse relationships to look for patterns such as social networks, fraud detection, and recommendation engines. Neo4j and JanusGraph are examples of graph databases.
+
+------------------------------
+
+Elasticsearch is a document oriented database. ... With a denormalized document database, every order with the product would have to be updated. In other words, with document oriented databases like Elasticsearch, we design our mappings and store our documents such that it's optimized for search and retrieval. Kibana lets users visualize data with charts and graphs in Elasticsearch.
+
+------------------------------
+
+As Redis is an in-memory storage, you cannot store large data that won't fit you machine's memory size. Redis usually work very bad when the data it stores is larger than 1/3 of the RAM size. So, this is the fatal limitation of using Redis as a database.
+
+------------------------------
+
+load balancing algorithms, including round robin, server response time and the least connection method
+
+------------------------------
+
+Difference between promise and observable :
+
+The first difference is that a Promise is eager, whereas an Observable is lazy.
+
+Promise is always asynchronous. Even if it’s immediatelly resolved. However, an Observable can be synchronous.
+
+A Promise object may provide only a single value. It can be an array but it’s still a single object. On the contrary, an Observable may emit multiple values over time.
+
+------------------------------
+
+Default bean scope in spring is singleton
+Default Transaction Propogation scope in spring is REQUIRED
+
+1). REQUIRED is the default propagation. Spring checks if there is an active transaction, then it creates a new one if nothing existed. Otherwise, the business logic appends to the currently active transaction
+2). Spring first checks if an active transaction exists. If a transaction exists, then the existing transaction will be used. If there isn't a transaction, it is executed non-transactional
+3). When the propagation is MANDATORY, if there is an active transaction, then it will be used. If there isn't an active transaction, then Spring throws an exception
+4). For transactional logic with NEVER propagation, Spring throws an exception if there's an active transaction
+5). Spring at first suspends the current transaction if it exists, then the business logic is executed without a transaction
+
+------------------------------
+
+Static variables are not thread safe. Instance variables do not require thread synchronization unless shared among threads. But, static variables are always shared by all the threads in the process. Hence, access to static variable is not thread safe.
+
+------------------------------
+
+1). with the new approach, you get a new object every time, whether you want to or not. Even if UserDaoImpl is reusable, stateless and threadsafe (which DAO classes should strive to be) you will still create new instances of them at every place they are needed.
+
+This may not be a huge issue at first, but consider as the object graph grows - the UserDaoImpl perhaps needs a Hibernate session, which needs a DataSource, which needs a JDBC connection - it quickly becomes a lot of objects that has to be created and initialized over and over again. When you rely on new in your code, you are also spreading out initialization logic over a whole bunch of places. Like in this example, you need to have code in your UserDaoImpl to open a JDBC connection with the proper parameters, but all other DAO classes have to do the same thing.
+
+And here is where Inversion-of-Control (IoC) comes in. It aims to address just these things, by decoupling object creation and life-cycle from object binding and usage. The most basic application of IoC is a simple Factory class. A more sophisticated approach is Dependency Injection, such as Spring.
+
+Is there an impact on the performance?
+
+Yes, but it's most likely not going to be very significant. Using Springs dependency injection costs a little more in startup-time as the container has to be initialized and all managed objects set up. However, since you won't be creating new instances of your managed objects (assuming that is how you design them), you'll gain some runtime performance from less GC load and less object creation.
+
+Your big gain however is going to be in maintainability and robustness of your application.
+
+2). Look We have 100 Classes that uses UserDao class, And you get dao instance like that: private UserDao userDao = new UserDaoImpl(); in 100 places,
+
+After few weeks the requirement changed and we need to use LdapUserDao or something similar
+
+class LdapUserDao implements UserDao{
+
+}
+that implements UserDao. What do you do? How do you handle your new keywords, You tied impl class into usage.
+
+If you use @Autowired in 100 places then from one place (if you use xml based config then, just go xml and switch to another UserDao from xml, if annotation the go to that component and switch Spring annotation to proper one) manage it, so in 100 places it appears. This is what is called DI pattern. This is whole purpose of DI
+
+Another important thing is with spring annotation even you can manage object scope, but with new keyword no way(unles you do dumb singleton or something like that), I am sure with new keyword you can no have
+
+  Prototype
+  Request
+  Single
+Scoped objects
+
+In terms of performance, It is quite difficult to say, unless to see your code. But I am sure at worst case they may have equal performance, otherwise springs way is fast
+
+------------------------------
+
+Java 8 provides following features for Java Programming:
+
+Lambda expressions,
+Method references,
+Functional interfaces,
+Stream API,
+Default methods,
+Base64 Encode Decode,
+Static methods in interface,
+Optional class,
+Collectors class,
+ForEach() method,
+Parallel array sorting,
+Nashorn JavaScript Engine,
+Type and Repating Annotations,
+IO Enhancements,
+Concurrency Enhancements,
+JDBC Enhancements etc
+
+-------------------------------
+
+5 types of bean scopes supported :
+
+singleton – Return a single bean instance per Spring IoC container
+prototype – Return a new bean instance each time when requested
+request – Return a single bean instance per HTTP request. 
+session – Return a single bean instance per HTTP session. 
+globalSession – Return a single bean instance per global HTTP session. 
+
+-------------------------------
+
+Configuration of dependencies are read from XML, annotations or Java DSL (JavaConfig). Then Spring DI engine wires the dependencies based on the metadata from the configuration using the Java reflection API.
+
+-------------------------------
+
+There are three approaches to send a message to Kafka.
+
+1). Fire-and-forget Producer
+Send and forget is the simplest approach. In this method, we send a message to the broker and don’t care if it was successfully received or not.
+Kafka is a distributed system. It comes with inbuilt fault tolerance feature. That makes Kafka a highly available system. So most of the time, your message will reach to the broker. We also know that producer will automatically retry in case of recoverable error. So, the probability of losing your messages is thin.
+There are many use cases where you are dealing with huge volumes and losing a small portion of records is not critical. For example, if you are counting hits on a video, or collecting a twitter feed for sentiment analysis.
+
+2). Synchronous Producer
+In this approach, we send a message and wait until we get a response. In the case of a success, we get a RecordMetadata object, and in the event of failure, we get an exception. Most of the time, we don't care about the success and the RecordMetadata that we receive. We only care about exception because we want to log errors for later analysis and appropriate action. You can adopt this method if your messages are critical and you can't afford to lose anything.
+But it is important to notice that synchronous approach will slow you down. It will limit your throughput because you are waiting for every message to get acknowledged. You are sending one message and waiting for success, then you send your next message, and again wait for success. Each message will take some time to be delivered over the network.
+
+3). Asynchronous Producer
+In this method, we send a message and provide a call back function to receive acknowledgment. We don't wait for success and failure. The producer will callback our function with RecordMetadata and an exception object. So, if you just care about exceptions, you simply look at the exception, if it is null, don't do anything. If the exception is not null, then you know it failed, so you can record the message details for later analysis.
+
+-------------------------------
+
+In systems that use client-side service discovery, clients query the service registry, select an available instance, and make a request. In systems that use server-side discovery, clients make requests via a router, which queries the service registry and forwards the request to an available instance.
+
+-------------------------------
+
+ a program gets divided into Stack, Data, Code, Heap
+threads share all segments except the stack. Threads have independent call stacks, however the memory in other thread stacks is still accessible and in theory you could hold a pointer to memory in some other thread's local stack frame (though you probably should find a better place to put that memory!).
+
+-------------------------------
