@@ -1,0 +1,29 @@
+Start Zookeeper: zookeeper-server-start /opt/homebrew/etc/kafka/zookeeper.properties
+Start Kafka server: kafka-server-start /opt/homebrew/etc/kafka/server.properties
+
+View Kafka Logs
+cd /opt/homebrew/var/lib/kafka-logs
+
+List topics
+kafka-topics --bootstrap-server=localhost:9092 --list
+
+Broker Version
+kafka-broker-api-versions --bootstrap-server localhost:9092 --version
+
+Create a topic
+kafka-topics --create --topic test --replication-factor 1 --partitions 1  --bootstrap-server localhost:9092
+
+List consumer groups
+kafka-consumer-groups --list --bootstrap-server localhost:9092
+
+Consume a message
+kafka-console-consumer --bootstrap-server localhost:9092 --topic test --from-beginning --max-messages 100
+
+Describe a topic 
+kafka-topics --describe --topic test --bootstrap-server localhost:9092
+
+Produce a message 
+kafka-console-producer --bootstrap-server localhost:9092 -topic test
+
+Delete a topic
+kafka-topics --bootstrap-server=localhost:9092 --delete --topic test
